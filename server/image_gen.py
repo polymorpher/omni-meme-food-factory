@@ -174,6 +174,14 @@ async def generate_recipe():
             "recipe": recipe,
         })
 
+@app.route('/<string:foodaddr>', methods=['GET'])
+def get_info(foodaddr):
+    return jsonify({
+        "name": "catcoin CAT",
+        "url_path": "https://storage.cloud.google.com/omni-meme-food-factory/c08af7a7-421b-4b36-b081-e22573eb7b57.png",
+        "recipe": "Recipe for Creating a White Cat Watermark Meme\n\nIngredients:\n\n1. Basic knowledge of Photoshop or any other image editing software\n2. High-resolution image of a white cat\n3. A funny or interesting caption or quote\n4. Watermark (Your name, brand, or logo)\n\nInstructions\n\n1. First, find or take a high-resolution picture of a white cat. The image should be clear. The cat can be in any pose that you find entertaining or relevant to the caption you have in mind.\n\n2. Next, use your knowledge of Photoshop or any image editing software to prepare the image. Open the image in the application, adjust the brightness, contrast, and clarity to enhance the image quality.\n\n3. After editing the primary image, the next step is to add the meme text. This should be something funny or engaging related to the expression or the posture of the cat in the image. Click on the text tool, place the cursor where you want the text to appear, and type your funny caption.\n\n4. Choose a font that is bold and easily readable. Opt for white text with black stroke, as it will ensure that the text is legible across a variety of backgrounds. Make sure the text is the right size, it should be big enough to read but not so big that it takes away from the image.\n\nHappy memeing!",
+    })
+
 @app.route('/reviews/<string:foodaddr>', methods=['GET'])
 def get_review(foodaddr):
     if foodaddr in reviews:
