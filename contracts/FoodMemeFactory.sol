@@ -3,7 +3,6 @@ pragma solidity ^0.8.26;
 
 import "@layerzerolabs/oapp-evm/interfaces/IOAppOptionsType3.sol";
 import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
-import {EndpointV2} from "@layerzerolabs/lz-evm-protocol-v2/contracts/EndpointV2.sol";
 import {FoodMeme} from "./FoodMeme.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Utils} from "./Utils.sol";
@@ -13,6 +12,7 @@ import {IOAppOptionsType3} from "@layerzerolabs/oapp-evm/interfaces/IOAppOptions
 // TODO: we should make FoodMemeFactory an OApp, so it can receive lz messages cross-chain and act as a synchronizer can manipulate (sync) states with instance contracts
 contract FoodMemeFactory is Ownable {
     using Clones for address;
+    using OptionsBuilder for bytes;
 
     address public FOOD_MEME_REF;
     string public baseUrl;
@@ -73,30 +73,30 @@ contract FoodMemeFactory is Ownable {
         for (uint256 i = 0; i < params.endPointIds.length; i++) {
             f.setPeer(params.endPointIds[i], params.deployedContracts[i]);
             if (params.receiveLibraries.length > i) {
-                f.endpoint.setReceiveLibrary(
+                f.endpoint().setReceiveLibrary(
                     address(f), params.endPointIds[i], params.receiveLibraries[i], params.gracePeriods[i]
                 );
             }
             if (params.sendLibraries.length > i) {
-                f.endpoint.setSendLibrary(
-                    address(f), params.endPointIds[i], params.sendLibraries[i], params.gracePeriods[i]
-                );
+                f.endpoint().setSendLibrary(address(f), params.endPointIds[i], params.sendLibraries[i]);
             }
             if (params.sendConfigParams[i].config.length > 0) {
-                f.endpoint.setConfig(address(f), params.sendLibraries[i], params.sendConfigParams[i].config);
+                f.endpoint().setConfig(address(f), params.sendLibraries[i], params.sendConfigParams[i].config);
             }
             if (params.receiveConfigParams[i].config.length > 0) {
-                f.endpoint.setConfig(address(f), params.receiveLibraries[i], params.receiveConfigParams[i].config);
-            }
-            if (params.enforceConfigParams[i].config.length > 0) {
-                f.setEnforcedOptions(params.enforceConfigParams[i].config);
+                f.endpoint().setConfig(address(f), params.receiveLibraries[i], params.receiveConfigParams[i].config);
             }
             if (params.minGasEnforceConfig[i] > 0) {
-                EnforcedOptionParam p = EnforcedOptionParam({
+                EnforcedOptionParam memory p = EnforcedOptionParam({
                     eid: params.endPointIds[i],
-                    msgType: OFTCore.SEND,
+                    msgType: 1, // OFTCore.SEND,
                     options: OptionsBuilder.newOptions().addExecutorLzReceiveOption(params.minGasEnforceConfig[i], 0)
                 });
+                EnforcedOptionParam[] memory pp = new EnforcedOptionParam[](1);
+                pp[0] = p;
+                f.setEnforcedOptions(pp);
+            }
+            if (params.enforceConfigParams[i].config.length > 0) {
                 f.setEnforcedOptions(params.enforceConfigParams[i].config);
             }
         }
