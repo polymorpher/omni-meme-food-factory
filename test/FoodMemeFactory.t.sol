@@ -17,7 +17,7 @@ import {MessagingFee, MessagingReceipt} from "@layerzerolabs/oft-evm/OFTCore.sol
 import {OFTMsgCodec} from "@layerzerolabs/oft-evm/libs/OFTMsgCodec.sol";
 import {OFTComposeMsgCodec} from "@layerzerolabs/oft-evm/libs/OFTComposeMsgCodec.sol";
 // DevTools imports
-import {TestHelperOz5} from "@layerzerolabs/test-devtools-evm-foundry/contracts/TestHelperOz5.sol";
+import {TestHelperOz5} from "./helper/TestHelperOz5.sol";
 
 contract FoodMemeFactoryTest is TestHelperOz5 {
     uint256 DEPLOYER_PRIVATE_KEY = vm.envUint("DEPLOYER_PRIVATE_KEY");
