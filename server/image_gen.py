@@ -9,12 +9,22 @@ from flask_cors import CORS
 from openai import AsyncOpenAI
 from google.cloud import storage
 from dotenv import load_dotenv
+from eth_utils import keccak
+import binascii
 
 # Load environment variables from .env file
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
+
+class ReviewData:
+    def __init__(self, hash_value, rating, balance):
+        self.hash = hash_value
+        self.rating = rating
+        self.balance = balance
+
+reviews = {}
 
 # Initialize AsyncOpenAI client
 client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -149,6 +159,52 @@ async def generate_recipe():
             "message": "Receipe generated.",
             "recipe": recipe,
         })
+
+@app.route('/reviews/<int:id>', methods=['GET'])
+def get_review(id):
+    if id in reviews:
+        review = reviews[id]
+        return jsonify({
+            'id': id,
+            'hash': review.hash,
+            'rating': review.rating,
+            'balance': review.balance
+        }), 200
+    return jsonify({'error': 'Review not found'}), 404
+
+@app.route('/review', methods=['POST'])
+def create_review():
+    data = request.json
+    if not data or 'id' not in data:
+        return jsonify({'error': 'Invalid request. Must include id'}), 400
+
+    id = data['id']
+    hash_value = data.get('hash', '')
+
+    try:
+        hash_bytes = binascii.unhexlify(hash_value)
+        if len(hash_bytes) != 32:
+            raise ValueError("hash must be 32 bytes long")
+    except (ValueError, binascii.Error):
+        return jsonify({'error': 'Invalid hash. Must be a 64-character hex string representing 32 bytes'}), 400
+
+    rating = data.get('rating', 0)
+    balance = data.get('balance', 0)
+
+    if not isinstance(rating, int) or rating < 0 or rating > 255:
+        return jsonify({'error': 'Invalid rating. Must be an integer between 0 and 255'}), 400
+ 
+    if not isinstance(balance, int) or balance < 0:
+        return jsonify({'error': 'Invalid balance. Must be a non-negative integer'}), 400
+
+    reviews[id] = ReviewData(hash_value, rating, balance)
+
+    return jsonify({
+        'id': id,
+        'hash': hash_value,
+        'rating': rating,
+        'balance': balance
+    }), 201
 
 if __name__ == '__main__':
     app.run(debug=True)
