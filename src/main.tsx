@@ -46,6 +46,23 @@ interface RecipeResponse {
   recipe: string
 }
 
+interface ChainOptionType {
+  value: string
+  label: string
+  symbol: string
+}
+
+const chainOptions: ChainOptionType[] = [
+  { value: 'bitcoin', label: 'Bitcoin', symbol: 'BTC' },
+  { value: 'ethereum', label: 'Ethereum', symbol: 'ETH' },
+  { value: 'polygon', label: 'Polygon', symbol: 'MATIC' },
+  { value: 'harmony', label: 'Harmony', symbol: 'ONE' },
+  { value: 'arbitrum', label: 'Arbitrum', symbol: 'ARB' },
+  { value: 'base', label: 'Base', symbol: 'BASE' },
+  { value: 'solana', label: 'Solana', symbol: 'SOL' },
+  { value: 'avalanche', label: 'Avalanche', symbol: 'AVAX' }
+]
+
 const App = (): React.JSX.Element => {
   const [prompt, setPrompt] = useState('')
   const [urlPath, setUrlPath] = useState('')
@@ -62,6 +79,7 @@ const App = (): React.JSX.Element => {
   const [constantA, setConstantA] = useState('1')
   const [constantB, setConstantB] = useState('0')
   const [constantC, setConstantC] = useState('0')
+  const [selectedChain, setSelectedChain] = useState('ethereum')
   const toast = useToast()
 
   const generateRecipe = async (prompt: string): Promise<void> => {
@@ -188,7 +206,6 @@ const App = (): React.JSX.Element => {
 
   const handleLaunch = (e: React.FormEvent): void => {
     e.preventDefault()
-    // Here you would typically send the launch parameters to your backend or smart contract
     console.log('Launching with parameters:', {
       name,
       symbol,
@@ -196,16 +213,24 @@ const App = (): React.JSX.Element => {
       priceMode,
       constantA,
       constantB,
-      constantC
+      constantC,
+      chain: selectedChain
     })
     toast({
       title: 'Launch Initiated',
-      description: 'Your food meme coin is being launched!',
+      description: `Your food meme coin is being launched on ${selectedChain}!`,
       status: 'success',
       duration: 3000,
       isClosable: true
     })
   }
+
+  const ChainOption: React.FC<ChainOptionType> = ({ value, label, symbol }) => (
+    <HStack spacing={2} align="center">
+      <Text fontWeight="bold">{label}</Text>
+      <Text color="gray.500" fontSize="sm"> {symbol}</Text>
+    </HStack>
+  )
 
   return (
     <ChakraProvider>
@@ -359,6 +384,26 @@ const App = (): React.JSX.Element => {
                           <NumberDecrementStepper />
                         </NumberInputStepper>
                       </NumberInput>
+                    </FormControl>
+                    <FormControl isRequired>
+                      <FormLabel>Chain</FormLabel>
+                      <Select
+                        value={selectedChain}
+                        onChange={(e) => { setSelectedChain(e.target.value) }}
+                        sx={{
+                          '& > option': {
+                            background: 'white',
+                            color: 'black',
+                            padding: '10px'
+                          }
+                        }}
+                      >
+                        {chainOptions.map((chain) => (
+                          <option key={chain.value} value={chain.value}>
+                            <ChainOption {...chain} />
+                          </option>
+                        ))}
+                      </Select>
                     </FormControl>
                     <FormControl isRequired>
                       <FormLabel>Price Mode</FormLabel>
