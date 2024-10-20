@@ -16,9 +16,8 @@ Launch your own AI-powered food meme coin as Omni Fungible Token (OFT) on 70+ ch
   - If you set a lock up period in launch parameters, you can also unlock the tokens early. Tokens cannot be transferred during lock up period.
   - Any token holder can add a review / delete their own review. Anyone can also check current average review rating on chain.
   - Review texts (stored on server or by third party) can be verified using hash stored on chain
-  - 
-
-
+  - At the moment, tokens can only be minted on the configured "mintChains", which should be a single chain for now. This will be improved later, see TODO 
+  - At the moment, reviews and supply can only be tracked on the configured "masterChain". This will be improved later, see TODO
 
 ## Test Locally
 
