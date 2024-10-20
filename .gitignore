@@ -15,5 +15,6 @@ docs/
 .vscode
 
 /server/myenv
+/server/__pycache__
 node_modules
 

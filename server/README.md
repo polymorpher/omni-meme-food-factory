@@ -25,7 +25,7 @@ Follow these steps to set up and run the project:
    python3 -m venv myenv
    source myenv/bin/activate
 
-   pip install flask flask-cors openai python-dotenv google-cloud-storage requests
+   pip install flask flask-cors openai google-cloud-storage python-dotenv aiohttp aiofiles hypercorn
    ```
 
 3. **Authenticate with Google Cloud**
@@ -47,7 +47,7 @@ Follow these steps to set up and run the project:
 After completing the setup, you can run the application using:
 
 ```
-python image_gen.py
+hypercorn image_gen:app
 ```
 
 ## API Endpoints
