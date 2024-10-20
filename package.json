@@ -25,6 +25,7 @@
         "react-dom": "^18.2.0",
         "react-hook-form": "^7.43.7",
         "react-router-dom": "^6.27.0",
+        "react-select": "^5.8.1",
         "viem": "^2.21.30",
         "wagmi": "^2.12.20"
     },

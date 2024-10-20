@@ -28,9 +28,9 @@ import {
 import { Image, Sparkles, ArrowRight } from 'lucide-react'
 import { createPublicClient, http } from 'viem'
 import { mainnet } from 'viem/chains'
-import { chainOptions, type ChainOptionType } from './utils'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useAccount } from 'wagmi'
+import MultiSelectChainOptions from './multiselect'
 
 const client = createPublicClient({
   chain: mainnet,
@@ -66,7 +66,7 @@ const Launch = (): React.JSX.Element => {
   const [constantA, setConstantA] = useState('1')
   const [constantB, setConstantB] = useState('0')
   const [constantC, setConstantC] = useState('0')
-  const [selectedChain, setSelectedChain] = useState('ethereum')
+  const [selectedChains, setSelectedChains] = useState<string[]>([])
   const toast = useToast()
   const [isDeployingToBase, setIsDeployingToBase] = useState(false)
   const [isDeployingToHarmony, setIsDeployingToHarmony] = useState(false)
@@ -211,11 +211,11 @@ const Launch = (): React.JSX.Element => {
       constantA,
       constantB,
       constantC,
-      chain: selectedChain
+      chains: selectedChains
     })
     toast({
       title: 'Launch Initiated',
-      description: `Your food meme coin is being launched on ${selectedChain}!`,
+      description: `Your food meme coin is being launched on ${selectedChains}!`,
       status: 'success',
       duration: 3000,
       isClosable: true
@@ -250,13 +250,6 @@ const Launch = (): React.JSX.Element => {
     setIsDeployingToPolygon(false)
     setHasDeployedToPolygon(true)
   }
-
-  const ChainOption: React.FC<ChainOptionType> = ({ value, label, symbol }) => (
-    <HStack spacing={2} align="center">
-      <Text fontWeight="bold">{label}</Text>
-      <Text color="gray.500" fontSize="sm"> {symbol}</Text>
-    </HStack>
-  )
 
   return (
     <Box
@@ -410,26 +403,9 @@ const Launch = (): React.JSX.Element => {
                     </NumberInputStepper>
                   </NumberInput>
                 </FormControl>
-                <FormControl isRequired>
-                  <FormLabel>Chain</FormLabel>
-                  <Select
-                        value={selectedChain}
-                        onChange={(e) => { setSelectedChain(e.target.value) }}
-                        sx={{
-                          '& > option': {
-                            background: 'white',
-                            color: 'black',
-                            padding: '10px'
-                          }
-                        }}
-                      >
-                    {chainOptions.map((chain) => (
-                      <option key={chain.value} value={chain.value}>
-                        <ChainOption {...chain} />
-                      </option>
-                    ))}
-                  </Select>
-                </FormControl>
+                <MultiSelectChainOptions
+                onChange={(chains) => { setSelectedChains(chains) }}
+                />
                 <FormControl isRequired>
                   <FormLabel>Price Mode</FormLabel>
                   <Select value={priceMode} onChange={(e) => { setPriceMode(e.target.value) }}>
