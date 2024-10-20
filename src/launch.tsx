@@ -56,6 +56,7 @@ const Launch = (): React.JSX.Element => {
   const [walletAddress, setWalletAddress] = useState('')
   const launchParamsRef = useRef<HTMLDivElement>(null)
   const memeRecipeRef = useRef<HTMLDivElement>(null)
+  const deployRef = useRef<HTMLDivElement>(null)
   const [name, setName] = useState('')
   const [symbol, setSymbol] = useState('')
   const [maxSupply, setMaxSupply] = useState('1000000')
@@ -65,6 +66,12 @@ const Launch = (): React.JSX.Element => {
   const [constantC, setConstantC] = useState('0')
   const [selectedChain, setSelectedChain] = useState('ethereum')
   const toast = useToast()
+  const [isDeployingToBase, setIsDeployingToBase] = useState(false)
+  const [isDeployingToHarmony, setIsDeployingToHarmony] = useState(false)
+  const [isDeployingToPolygon, setIsDeployingToPolygon] = useState(false)
+  const [hasDeployedToBase, setHasDeployedToBase] = useState(false)
+  const [hasDeployedToHarmony, setHasDeployedToHamony] = useState(false)
+  const [hasDeployedToPolygon, setHasDeployedToPolygon] = useState(false)
 
   const generateRecipe = async (prompt: string): Promise<void> => {
     setIsRecipeLoading(true)
@@ -195,7 +202,7 @@ const Launch = (): React.JSX.Element => {
     setIsWalletConnected(true)
   }
 
-  const handleLaunch = (e: React.FormEvent): void => {
+  const handleLaunch = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault()
     console.log('Launching with parameters:', {
       name,
@@ -214,6 +221,35 @@ const Launch = (): React.JSX.Element => {
       duration: 3000,
       isClosable: true
     })
+    await startDeployments()
+  }
+
+  const sleep = async (ms: number): Promise<void> => { await new Promise<void>(resolve => setTimeout(resolve, ms)) }
+
+  const startDeployments = async (): Promise<void> => {
+    setTimeout(() => {
+      if (deployRef.current) {
+        deployRef.current.scrollIntoView({ behavior: 'smooth' })
+      } else {
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          behavior: 'smooth'
+        })
+      }
+    }, 100)
+
+    setIsDeployingToBase(true)
+    await sleep(1000) // Wait for 1 second
+    setIsDeployingToBase(false)
+    setHasDeployedToBase(true)
+    setIsDeployingToHarmony(true)
+    await sleep(1000) // Wait for 1 second
+    setIsDeployingToHarmony(false)
+    setHasDeployedToHamony(true)
+    setIsDeployingToPolygon(true)
+    await sleep(1000) // Wait for 1 second
+    setIsDeployingToPolygon(false)
+    setHasDeployedToPolygon(true)
   }
 
   const ChainOption: React.FC<ChainOptionType> = ({ value, label, symbol }) => (
@@ -463,6 +499,41 @@ const Launch = (): React.JSX.Element => {
                   Wallet Connected: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
                 </Text>
                 )}
+                <Box w="100%" bg="white" p={6} borderRadius="md" boxShadow="md" ref={deployRef}>
+                  {isDeployingToBase && (
+                    <Box w="100%">
+                      <Text mb={2}>Deploying to Base...</Text>
+                      <Progress size="xs" isIndeterminate colorScheme="purple" />
+                    </Box>
+                  )}
+                  {hasDeployedToBase && (
+                    <Box w="100%">
+                      <Text mb={2}>Deployed to Base. ✅</Text>
+                    </Box>
+                  )}
+                  {isDeployingToHarmony && (
+                    <Box w="100%">
+                      <Text mb={2}>Deploying to Polygon...</Text>
+                      <Progress size="xs" isIndeterminate colorScheme="purple" />
+                    </Box>
+                  )}
+                  {hasDeployedToHarmony && (
+                    <Box w="100%">
+                      <Text mb={2}>Deployed to Harmony. ✅</Text>
+                    </Box>
+                  )}
+                  {isDeployingToPolygon && (
+                    <Box w="100%">
+                      <Text mb={2}>Deploying to Harmony...</Text>
+                      <Progress size="xs" isIndeterminate colorScheme="purple" />
+                    </Box>
+                  )}
+                  {hasDeployedToPolygon && (
+                    <Box w="100%">
+                      <Text mb={2}>Deployed to Polygon. ✅</Text>
+                    </Box>
+                  )}
+                </Box>
               </VStack>
             </form>
           </Box>
