@@ -1,12 +1,10 @@
 import os
 import base64
 import uuid
-import asyncio
-import aiohttp
-import aiofiles
+import requests
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from openai import AsyncOpenAI
+from openai import OpenAI
 from google.cloud import storage
 from dotenv import load_dotenv
 from eth_utils import keccak
@@ -25,12 +23,12 @@ class ReviewData:
 
 reviews = {}
 
-# Initialize AsyncOpenAI client
-client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Initialize OpenAI client
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-async def generate_recipe(prompt):
+def generate_recipe_with_prompt(prompt):
     try:
-        response = await client.chat.completions.create(
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=[
                 {
@@ -39,14 +37,15 @@ async def generate_recipe(prompt):
                 }
             ]
         )
+        print('generate recipe response: ', response.choices[0].message.content)
         return response.choices[0].message.content
     except Exception as error:
         print('Error generating recipe:', str(error))
         return None
 
-async def generate_image(prompt, size, quality, n, response_format):
+def generate_image(prompt, size, quality, n, response_format):
     try:
-        response = await client.images.generate(
+        response = client.images.generate(
             model="dall-e-3",
             prompt=prompt,
             size=size,
@@ -57,16 +56,17 @@ async def generate_image(prompt, size, quality, n, response_format):
         if response_format == 'b64_json':
             return response.data[0].b64_json
         else:
+            print(response.data[0].url)
             return response.data[0].url
     except Exception as e:
         print(f"Error generating image: {str(e)}")
         return None
 
-async def save_image(b64_json, filename):
-    async with aiofiles.open(filename, "wb") as file:
-        await file.write(base64.b64decode(b64_json))
+def save_image(b64_json, filename):
+    with open(filename, "wb") as file:
+        file.write(base64.b64decode(b64_json))
 
-async def upload_blob(bucket_name, source_file_name, destination_blob_name):
+def upload_blob(bucket_name, source_file_name, destination_blob_name):
     try:
         storage_client = storage.Client()
         bucket = storage_client.bucket(bucket_name)
@@ -74,8 +74,7 @@ async def upload_blob(bucket_name, source_file_name, destination_blob_name):
 
         generation_match_precondition = 0
 
-        await asyncio.to_thread(
-            blob.upload_from_filename,
+        blob.upload_from_filename(
             source_file_name,
             if_generation_match=generation_match_precondition
         )
@@ -89,23 +88,22 @@ async def upload_blob(bucket_name, source_file_name, destination_blob_name):
 def generate_unique_filename(file_extension=".png"):
     return f"{uuid.uuid4()}{file_extension}"
 
-async def download_image(url, filename):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            if response.status == 200:
-                async with aiofiles.open(filename, 'wb') as f:
-                    await f.write(await response.read())
-                return True
+def download_image(url, filename):
+    response = requests.get(url)
+    if response.status_code == 200:
+        with open(filename, 'wb') as f:
+            f.write(response.content)
+        return True
     return False
 
-async def process_image(response_format, res, bucket_name, destination_blob_name):
+def process_image(response_format, res, bucket_name, destination_blob_name):
     temp_filename = f"temp_image_{destination_blob_name}"
     if response_format == 'b64_json':
-        await save_image(res, temp_filename)
+        save_image(res, temp_filename)
     else:
-        await download_image(res, temp_filename)
-    await upload_blob(bucket_name, temp_filename, destination_blob_name)
-    return f"https://storage.cloud.google.com/{bucket_name}/{temp_filename}"
+        download_image(res, temp_filename)
+    upload_blob(bucket_name, temp_filename, destination_blob_name)
+    return f"https://storage.cloud.google.com/{bucket_name}/{destination_blob_name}"
 
 def verify_keccak_hash(input_data, expected_hash):
     if isinstance(input_data, str):
@@ -123,7 +121,7 @@ def verify_keccak_hash(input_data, expected_hash):
     return calculated_hex.lower() == expected_hash.lower()
 
 @app.route('/generate-and-upload', methods=['POST'])
-async def generate_and_upload():
+def generate_and_upload():
     data = request.json
     prompt = data.get('prompt', 'Sichuan hotpot')
     size = data.get('size', '1024x1024')
@@ -137,16 +135,14 @@ async def generate_and_upload():
     if (isFake == 'true'):
         return jsonify({
             "message": "Image generated and uploaded successfully.",
-            "url_path": "https://storage.cloud.google.com/omni-meme-food-factory/c08af7a7-421b-4b36-b081-e22573eb7b57.png",
+            "url_path": "https://storage.googleapis.com/omni-meme-food-factory/63e2424e-c0eb-4605-856c-ecfabdf54e69.png",
         })
     else:
-        image_task = asyncio.create_task(generate_image(prompt, size, quality, n, response_format))
-
-        res = await image_task
+        res = generate_image(prompt, size, quality, n, response_format)
         if not res:
             return jsonify({"error": "Failed to generate image"}), 500
 
-        url_path = await process_image(response_format, res, bucket_name, destination_blob_name)
+        url_path = process_image(response_format, res, bucket_name, destination_blob_name)
 
         return jsonify({
             "message": "Image generated and uploaded successfully.",
@@ -154,32 +150,30 @@ async def generate_and_upload():
         })
 
 @app.route('/generate-recipe', methods=['POST'])
-async def generate_recipe():
+def generate_recipe():
     data = request.json
     prompt = data.get('prompt', 'Sichuan hotpot')
     isFake = data.get('isFake', 'true')
 
     if (isFake == 'true'):
          return jsonify({
-            "message": "Receipe generated.",
-            "recipe": "Recipe for Creating a White Cat Watermark Meme\n\nIngredients:\n\n1. Basic knowledge of Photoshop or any other image editing software\n2. High-resolution image of a white cat\n3. A funny or interesting caption or quote\n4. Watermark (Your name, brand, or logo)\n\nInstructions\n\n1. First, find or take a high-resolution picture of a white cat. The image should be clear. The cat can be in any pose that you find entertaining or relevant to the caption you have in mind.\n\n2. Next, use your knowledge of Photoshop or any image editing software to prepare the image. Open the image in the application, adjust the brightness, contrast, and clarity to enhance the image quality.\n\n3. After editing the primary image, the next step is to add the meme text. This should be something funny or engaging related to the expression or the posture of the cat in the image. Click on the text tool, place the cursor where you want the text to appear, and type your funny caption.\n\n4. Choose a font that is bold and easily readable. Opt for white text with black stroke, as it will ensure that the text is legible across a variety of backgrounds. Make sure the text is the right size, it should be big enough to read but not so big that it takes away from the image.\n\nHappy memeing!",
+            "message": "Recipe generated.",
+            "recipe": "Ingredients:\n\nFor Chicken:\n-1 whole chicken (about 3 to 4 lbs)\n-2 teaspoon salt\n-2 teaspoon sesame oil\n-Freshly ground black pepper\n-A bunch of green onions\n-2 inch piece of fresh ginger, peeled\n\nFor Rice:\n-2 cups of jasmine rice\n-2 teaspoons of salt\n-4 cloves of garlic, minced\n-1 thumb size ginger, minced\n-4 cups of chicken broth (from boiling the chicken)\n-2 tablespoon of vegetable oil\n\nFor Sauce (optional):\n-2 tablespoons of oyster sauce\n-1 tablespoon of soy sauce\n-1 tablespoon of cornstarch dissolved in 3 tablespoons of water\n-1/2 cup of chicken broth\n-1 tablespoon of sugar\n\nInstructions:\n\n1. Start by cleaning the chicken. Remove any excess fat and clean it thoroughly.\n\n2. Submerge the chicken in a big pot of water. Add in the bunch of green onions and fresh ginger.\n\n3. Bring the water to a boil and then reduce to a simmer.\n\n4. Let the chicken cook for about 45 minutes or until it is fully cooked.\n\n5. Once the chicken is cooked, remove it from the pot and put it into a bowl of ice water. This helps to keep the chicken skin firm.\n\n6. Rub the chicken with salt, sesame oil, and black pepper.\n\n7. To prepare the rice, wash the jasmine rice under running water until the water runs clear.\n\n8. Heat up 2 tablespoons of vegetable oil in a pot, then add the minced garlic and minced ginger. Stir-fry until fragrant.\n\n9. Add in the jasmine rice and stir for a few minutes, then pour in 4 cups of the chicken broth used to cook the chicken.\n\n10. Add salt, then bring it to a boil. Once boiling, reduce to a simmer and cover the pot. Cook until the rice is done, usually takes around 15-20 minutes.\n\n11. To make the optional sauce, combine the oyster sauce, soy sauce, cornstarch water, chicken broth, and sugar in a saucepan. Stir well and heat over medium heat until it thickens.\n\n12. Now, carve your chicken and serve it over the flavorful jasmine rice. Pour some of the optional sauce over the chicken if desired.\n\n13. Hainanese chicken rice can be served with some cucumber slices and fresh cilantro. Enjoy this comforting and delicious dish!\n\nNote: The timing may vary depending on the size of the chicken.",
         })
     else:
-        recipe_task = asyncio.create_task(generate_recipe(prompt))
-
-        recipe = await recipe_task
+        recipe = generate_recipe_with_prompt(prompt)
 
         return jsonify({
-            "message": "Receipe generated.",
+            "message": "Recipe generated.",
             "recipe": recipe,
         })
 
 @app.route('/<string:foodaddr>', methods=['GET'])
 def get_info(foodaddr):
     return jsonify({
-        "name": "catcoin CAT",
-        "url_path": "https://storage.cloud.google.com/omni-meme-food-factory/c08af7a7-421b-4b36-b081-e22573eb7b57.png",
-        "recipe": "Recipe for Creating a White Cat Watermark Meme\n\nIngredients:\n\n1. Basic knowledge of Photoshop or any other image editing software\n2. High-resolution image of a white cat\n3. A funny or interesting caption or quote\n4. Watermark (Your name, brand, or logo)\n\nInstructions\n\n1. First, find or take a high-resolution picture of a white cat. The image should be clear. The cat can be in any pose that you find entertaining or relevant to the caption you have in mind.\n\n2. Next, use your knowledge of Photoshop or any image editing software to prepare the image. Open the image in the application, adjust the brightness, contrast, and clarity to enhance the image quality.\n\n3. After editing the primary image, the next step is to add the meme text. This should be something funny or engaging related to the expression or the posture of the cat in the image. Click on the text tool, place the cursor where you want the text to appear, and type your funny caption.\n\n4. Choose a font that is bold and easily readable. Opt for white text with black stroke, as it will ensure that the text is legible across a variety of backgrounds. Make sure the text is the right size, it should be big enough to read but not so big that it takes away from the image.\n\nHappy memeing!",
+        "name": "Hainanese Chicken Rice HCR",
+        "url_path": "https://storage.googleapis.com/omni-meme-food-factory/63e2424e-c0eb-4605-856c-ecfabdf54e69.png",
+        "recipe": "Ingredients:\n\nFor Chicken:\n-1 whole chicken (about 3 to 4 lbs)\n-2 teaspoon salt\n-2 teaspoon sesame oil\n-Freshly ground black pepper\n-A bunch of green onions\n-2 inch piece of fresh ginger, peeled\n\nFor Rice:\n-2 cups of jasmine rice\n-2 teaspoons of salt\n-4 cloves of garlic, minced\n-1 thumb size ginger, minced\n-4 cups of chicken broth (from boiling the chicken)\n-2 tablespoon of vegetable oil\n\nFor Sauce (optional):\n-2 tablespoons of oyster sauce\n-1 tablespoon of soy sauce\n-1 tablespoon of cornstarch dissolved in 3 tablespoons of water\n-1/2 cup of chicken broth\n-1 tablespoon of sugar\n\nInstructions:\n\n1. Start by cleaning the chicken. Remove any excess fat and clean it thoroughly.\n\n2. Submerge the chicken in a big pot of water. Add in the bunch of green onions and fresh ginger.\n\n3. Bring the water to a boil and then reduce to a simmer.\n\n4. Let the chicken cook for about 45 minutes or until it is fully cooked.\n\n5. Once the chicken is cooked, remove it from the pot and put it into a bowl of ice water. This helps to keep the chicken skin firm.\n\n6. Rub the chicken with salt, sesame oil, and black pepper.\n\n7. To prepare the rice, wash the jasmine rice under running water until the water runs clear.\n\n8. Heat up 2 tablespoons of vegetable oil in a pot, then add the minced garlic and minced ginger. Stir-fry until fragrant.\n\n9. Add in the jasmine rice and stir for a few minutes, then pour in 4 cups of the chicken broth used to cook the chicken.\n\n10. Add salt, then bring it to a boil. Once boiling, reduce to a simmer and cover the pot. Cook until the rice is done, usually takes around 15-20 minutes.\n\n11. To make the optional sauce, combine the oyster sauce, soy sauce, cornstarch water, chicken broth, and sugar in a saucepan. Stir well and heat over medium heat until it thickens.\n\n12. Now, carve your chicken and serve it over the flavorful jasmine rice. Pour some of the optional sauce over the chicken if desired.\n\n13. Hainanese chicken rice can be served with some cucumber slices and fresh cilantro. Enjoy this comforting and delicious dish!\n\nNote: The timing may vary depending on the size of the chicken.",
     })
 
 @app.route('/reviews/<string:foodaddr>', methods=['GET'])
