@@ -29,6 +29,7 @@ import { Image, Sparkles, ArrowRight } from 'lucide-react'
 import { createPublicClient, http } from 'viem'
 import { mainnet } from 'viem/chains'
 import { chainOptions, type ChainOptionType } from './utils'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
 
 const client = createPublicClient({
   chain: mainnet,
@@ -477,13 +478,14 @@ const Launch = (): React.JSX.Element => {
                   </NumberInput>
                 </FormControl>
                 <HStack spacing={4} justify="space-between">
-                  <Button
-                        colorScheme="purple"
-                        onClick={connectWallet}
-                        flex="1"
-                      >
-                    Connect Wallet
-                  </Button>
+                  {/* <Button */}
+                  {/*      colorScheme="purple" */}
+                  {/*      onClick={connectWallet} */}
+                  {/*      flex="1" */}
+                  {/*    > */}
+                  {/*  Connect Wallet */}
+                  {/* </Button> */}
+                  <ConnectButton/>
                   <Button
                         type="submit"
                         colorScheme="purple"
