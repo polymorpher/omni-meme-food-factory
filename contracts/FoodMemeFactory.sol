@@ -33,10 +33,11 @@ contract FoodMemeFactory is Ownable {
         return FOOD_MEME_REF.predictDeterministicAddressWithImmutableArgs(args, salt, address(this));
     }
 
-    function launch(Utils.MemeParams memory params) external {
+    function launch(Utils.MemeParams memory params, address maker, Utils.InitParams memory initParams) external {
         bytes32 salt = keccak256(abi.encodePacked(params.name, params.symbol, baseUrl, FOOD_MEME_REF));
         bytes memory args = abi.encode(params.name, params.symbol, params.endpoint, owner());
         address instance = FOOD_MEME_REF.cloneDeterministicWithImmutableArgs(args, salt);
         emit MemeLaunched(params.name, params.symbol, instance, msg.sender);
+        FoodMeme(instance).initialize(maker, initParams);
     }
 }

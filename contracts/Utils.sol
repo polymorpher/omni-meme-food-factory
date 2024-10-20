@@ -7,6 +7,14 @@ library Utils {
         string symbol;
         address endpoint;
     }
+
+    struct InitParams {
+        uint256 maxSupply;
+        uint256 maxPerMint;
+        uint256 minReviewThreshold;
+        PriceSettings priceSettings;
+    }
+
     // https://docs.layerzero.network/v2/developers/evm/oft/quickstart#token-supply-cap
 
     uint256 constant OTF_MAX_SUPPLY = 18_446_744_073_709;
@@ -30,9 +38,9 @@ library Utils {
 
     // TODO: check for risk of arithmetic error here. Probably switch to Q64 or Q96
     function computeUnitPrice(PriceSettings memory s, uint256 quantity, uint256 supply)
-        internal
-        pure
-        returns (uint256)
+    internal
+    pure
+    returns (uint256)
     {
         if (s.mode == PriceMode.ConstantPrice) {
             return s.c;

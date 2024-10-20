@@ -15,10 +15,13 @@ contract FoodMeme is MemeMetadata, OFT, AccessControl {
     uint256 public numReviewers;
     uint256 public ratingTotal;
 
+    // TODO: combine settings into single state var
+
     // TODO: this is local to the current chain. We should sync global max supply
     uint256 public maxSupply = 1_000_000_000 * 1e18;
 
     uint256 public maxPerMint = 100 * 1e18;
+
     uint256 public minReviewThreshold = 5 * 1e18;
 
     // TOOD: this is local to the current chain. We should have some globally synced, oracle-based dynamic price adjustment mechanism later
@@ -40,8 +43,8 @@ contract FoodMeme is MemeMetadata, OFT, AccessControl {
     uint256 unlockTime;
 
     constructor(string memory _name, string memory _symbol, address _lzEndpoint, address _delegate)
-        OFT(_name, _symbol, _lzEndpoint, _delegate)
-        Ownable(_delegate)
+    OFT(_name, _symbol, _lzEndpoint, _delegate)
+    Ownable(_delegate)
     {
         _grantRole(DEFAULT_ADMIN_ROLE, _delegate);
         _grantRole(ROLE_FACTORY, msg.sender);
@@ -69,8 +72,18 @@ contract FoodMeme is MemeMetadata, OFT, AccessControl {
         unlockTime = block.timestamp;
     }
 
-    function initialize(address maker) external onlyRole(ROLE_FACTORY) initializer {
+    function initialize(address maker, Utils.InitParams params) external onlyRole(ROLE_FACTORY) initializer {
         _grantRole(ROLE_MAKER, maker);
+        if (params.maxSupply > 0) {
+            setMaxSupply(params.maxSupply);
+        }
+        if (params.maxPerMint > 0) {
+            setMaxPerMint(params.maxPerMint);
+        }
+        if (params.minReviewThreshold) {
+            setMinReviewThreshold(params.minReviewThreshold);
+        }
+        setPriceSettings(params.priceSettings);
     }
 
     function setMaxSupply(uint256 _maxSupply) public onlyRole(ROLE_MAKER) {
