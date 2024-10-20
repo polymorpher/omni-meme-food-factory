@@ -110,7 +110,8 @@ const Mint = (): React.JSX.Element => {
     setBalances([
       { chain: 'Bitcoin', balance: '0.5 BTC' },
       { chain: 'Ethereum', balance: '2 ETH' },
-      { chain: 'Polygon', balance: '100 MATIC' }
+      { chain: 'Polygon', balance: '88 MATIC' },
+      { chain: 'Harmony', balance: '1000 ONE' }
     ])
     setReviews([
       { userAddress: '0x1234...5678', text: 'Great service!' },
@@ -185,10 +186,13 @@ const Mint = (): React.JSX.Element => {
                   <Box bg="white" p={6} borderRadius="md" boxShadow="md" h="100%" display="flex" flexDirection="column">
                     <Text fontSize="xl" fontWeight="bold" mb={4}>Supported Chains</Text>
                     <Box flex="1" overflowY="auto">
-                      {updatedChainOptions.map((chain) => (
-                        <Text key={chain.value} mb={2}>
-                          {chain.label} ({chain.symbol})
-                        </Text>
+                      {[
+                        { value: 'masterchain', label: 'MasterChain', symbol: 'MAS' },
+                        { value: 'polygon', label: 'Polygon', symbol: 'MATIC' },
+                        { value: 'harmony', label: 'Harmony', symbol: 'ONE' }].map((chain) => (
+                          <Text key={chain.value} mb={2}>
+                            {chain.label} ({chain.symbol})
+                          </Text>
                       ))}
                     </Box>
                   </Box>
