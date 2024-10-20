@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
   Box,
   VStack,
@@ -30,6 +30,7 @@ import { createPublicClient, http } from 'viem'
 import { mainnet } from 'viem/chains'
 import { chainOptions, type ChainOptionType } from './utils'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { useAccount } from 'wagmi'
 
 const client = createPublicClient({
   chain: mainnet,
@@ -47,6 +48,7 @@ interface RecipeResponse {
 }
 
 const Launch = (): React.JSX.Element => {
+  const { address, chainId } = useAccount()
   const [prompt, setPrompt] = useState('')
   const [urlPath, setUrlPath] = useState('')
   const [recipe, setRecipe] = useState('')
@@ -73,6 +75,10 @@ const Launch = (): React.JSX.Element => {
   const [hasDeployedToBase, setHasDeployedToBase] = useState(false)
   const [hasDeployedToHarmony, setHasDeployedToHamony] = useState(false)
   const [hasDeployedToPolygon, setHasDeployedToPolygon] = useState(false)
+
+  useEffect(() => {
+    setIsWalletConnected(!!address)
+  }, [address])
 
   const generateRecipe = async (prompt: string): Promise<void> => {
     setIsRecipeLoading(true)
