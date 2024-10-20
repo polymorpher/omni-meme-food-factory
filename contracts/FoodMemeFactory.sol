@@ -1,20 +1,30 @@
 // SPDX-License-Identifier: CC-BY-NC-4.0
 pragma solidity ^0.8.26;
 
+import "./FactoryHelper.sol";
+
+// can't use it because Ownable set initial owner in its constructor. duh.
+//import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
+
 import "@layerzerolabs/oapp-evm/interfaces/IOAppOptionsType3.sol";
-import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
+
+import {Create2} from "@openzeppelin/contracts/utils/Create2.sol";
+import {Create2} from "@openzeppelin/contracts/utils/Create2.sol";
 import {FoodMeme} from "./FoodMeme.sol";
+import {IOAppOptionsType3} from "@layerzerolabs/oapp-evm/interfaces/IOAppOptionsType3.sol";
+import {OptionsBuilder} from "@layerzerolabs/oapp-evm/libs/OptionsBuilder.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Utils} from "./Utils.sol";
-import {OptionsBuilder} from "@layerzerolabs/oapp-evm/libs/OptionsBuilder.sol";
-import {IOAppOptionsType3} from "@layerzerolabs/oapp-evm/interfaces/IOAppOptionsType3.sol";
 
 // TODO: we should make FoodMemeFactory an OApp, so it can receive lz messages cross-chain and act as a synchronizer can manipulate (sync) states with instance contracts
 contract FoodMemeFactory is Ownable {
-    using Clones for address;
+    //    using Clones for address;
     using OptionsBuilder for bytes;
 
-    address public FOOD_MEME_REF;
+    //    address public FOOD_MEME_REF;
+
+    FoodMemeFactoryHelper helper;
+
     string public baseUrl;
     uint256 public launchFee;
 
@@ -22,14 +32,16 @@ contract FoodMemeFactory is Ownable {
 
     event MemeLaunched(string name, string symbol, address indexed instance, address indexed maker);
 
-    constructor(address _food_meme_ref, string memory _baseUrl) Ownable(msg.sender) {
-        FOOD_MEME_REF = _food_meme_ref;
+    //    constructor(address _food_meme_ref, string memory _baseUrl) Ownable(msg.sender) {
+    //        FOOD_MEME_REF = _food_meme_ref;
+    constructor(FoodMemeFactoryHelper _helper, string memory _baseUrl) Ownable(msg.sender) {
         baseUrl = _baseUrl;
+        helper = _helper;
     }
 
-    function setRef(address _food_meme_ref) external onlyOwner {
-        FOOD_MEME_REF = _food_meme_ref;
-    }
+    //    function setRef(address _food_meme_ref) external onlyOwner {
+    //        FOOD_MEME_REF = _food_meme_ref;
+    //    }
 
     function setBaseUrl(string memory _baseUrl) external onlyOwner {
         baseUrl = _baseUrl;
@@ -40,9 +52,11 @@ contract FoodMemeFactory is Ownable {
     }
 
     function predictAddress(Utils.MemeParams memory params) external view returns (address) {
-        bytes32 salt = keccak256(abi.encodePacked(params.name, params.symbol, baseUrl, FOOD_MEME_REF));
+        bytes32 salt = keccak256(abi.encodePacked(params.name, params.symbol, baseUrl));
+        //        bytes32 salt = keccak256(abi.encodePacked(params.name, params.symbol, baseUrl, FOOD_MEME_REF));
         bytes memory args = abi.encode(params.name, params.symbol, params.endpoint, address(this));
-        return FOOD_MEME_REF.predictDeterministicAddressWithImmutableArgs(args, salt, address(this));
+        //        return FOOD_MEME_REF.predictDeterministicAddressWithImmutableArgs(args, salt, address(this));
+        return Create2.computeAddress(salt, helper.hash(args));
     }
 
     function launch(Utils.MemeParams memory params, address maker, Utils.InitParams memory initParams)
@@ -52,9 +66,11 @@ contract FoodMemeFactory is Ownable {
         if (msg.value < launchFee) {
             revert InsufficientLaunchFee();
         }
-        bytes32 salt = keccak256(abi.encodePacked(params.name, params.symbol, baseUrl, FOOD_MEME_REF));
+        bytes32 salt = keccak256(abi.encodePacked(params.name, params.symbol, baseUrl, params.endpoint));
+        //        bytes32 salt = keccak256(abi.encodePacked(params.name, params.symbol, baseUrl, FOOD_MEME_REF));
         bytes memory args = abi.encode(params.name, params.symbol, params.endpoint, address(this));
-        address instance = FOOD_MEME_REF.cloneDeterministicWithImmutableArgs(args, salt);
+        //        address instance = FOOD_MEME_REF.cloneDeterministicWithImmutableArgs(args, salt);
+        address instance = Create2.deploy(0, salt, abi.encodePacked(helper.code(args)));
         emit MemeLaunched(params.name, params.symbol, instance, msg.sender);
         FoodMeme f = FoodMeme(instance);
         f.initialize(maker, initParams);
