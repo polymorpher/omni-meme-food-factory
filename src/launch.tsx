@@ -521,7 +521,7 @@ const Launch = (): React.JSX.Element => {
                   )}
                   {isDeployingToHarmony && (
                     <Box w="100%">
-                      <Text mb={2}>Deploying to Polygon...</Text>
+                      <Text mb={2}>Deploying to Harmony...</Text>
                       <Progress size="xs" isIndeterminate colorScheme="purple" />
                     </Box>
                   )}
@@ -532,7 +532,7 @@ const Launch = (): React.JSX.Element => {
                   )}
                   {isDeployingToPolygon && (
                     <Box w="100%">
-                      <Text mb={2}>Deploying to Harmony...</Text>
+                      <Text mb={2}>Deploying to Polygon...</Text>
                       <Progress size="xs" isIndeterminate colorScheme="purple" />
                     </Box>
                   )}
