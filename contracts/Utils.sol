@@ -1,11 +1,34 @@
 // SPDX-License-Identifier: CC-BY-NC-4.0
 pragma solidity ^0.8.26;
 
+import "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/IMessageLibManager.sol";
+import "@layerzerolabs/oapp-evm/interfaces/IOAppOptionsType3.sol";
+
 library Utils {
     struct MemeParams {
         string name;
         string symbol;
         address endpoint;
+    }
+
+    struct LzSetConfigParam {
+        SetConfigParam[] config;
+    }
+
+    struct LzEnforcedOptionParam {
+        EnforcedOptionParam[] config;
+    }
+
+    struct LzParams {
+        uint256[] endPointIds;
+        address[] deployedContracts;
+        address[] sendLibraries;
+        address[] receiveLibraries;
+        uint256[] gracePeriods;
+        uint256[] minGasEnforceConfig;
+        LzSetConfigParam[] sendConfigParams;
+        LzSetConfigParam[] receiveConfigParams;
+        LzEnforcedOptionParam[] enforceConfigParams;
     }
 
     struct InitParams {
