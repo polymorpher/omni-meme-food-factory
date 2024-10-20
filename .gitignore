@@ -12,6 +12,10 @@ docs/
 
 # Dotenv file
 .env
+.env.*
+!.env.example
+!.env.example.*
+
 .vscode
 
 /server/myenv
