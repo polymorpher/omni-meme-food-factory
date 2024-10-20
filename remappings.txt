@@ -1,5 +1,5 @@
-@layerzerolabs/oft-evm/=lib/devtools/packages/oft-evm/
-@layerzerolabs/oapp-evm/=lib/devtools/packages/oapp-evm/
+@layerzerolabs/oft-evm/=lib/layerzero-v2/packages/layerzero-v2/evm/oapp/contracts/oft/
+@layerzerolabs/oapp-evm/=lib/layerzero-v2/packages/layerzero-v2/evm/oapp/contracts/oapp/
 @layerzerolabs/lz-evm-protocol-v2/=lib/layerzero-v2/packages/layerzero-v2/evm/protocol/
 @openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/
 ds-test/=lib/layerzero-v2/lib/forge-std/lib/ds-test/src/
