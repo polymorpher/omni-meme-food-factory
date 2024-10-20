@@ -278,7 +278,7 @@ const Launch = (): React.JSX.Element => {
                   bgClip="text"
                   textAlign="center"
                 >
-            Hello, Yanhe!
+            Hello, Baozi!
           </Heading>
           <Text fontSize="md" color="gray.600" textAlign="center">
             I will provide some example prompts for generating food meme coins.
