@@ -9,6 +9,8 @@ library Utils {
     }
 
     struct InitParams {
+        bool mintable;
+        uint256 masterChain;
         uint256 maxSupply;
         uint256 maxPerMint;
         uint256 minReviewThreshold;
@@ -38,9 +40,9 @@ library Utils {
 
     // TODO: check for risk of arithmetic error here. Probably switch to Q64 or Q96
     function computeUnitPrice(PriceSettings memory s, uint256 quantity, uint256 supply)
-    internal
-    pure
-    returns (uint256)
+        internal
+        pure
+        returns (uint256)
     {
         if (s.mode == PriceMode.ConstantPrice) {
             return s.c;
