@@ -70,6 +70,8 @@ const App = (): React.JSX.Element => {
   const [isLoading, setIsLoading] = useState(false)
   const [isRecipeLoading, setIsRecipeLoading] = useState(false)
   const [isLaunching, setIsLaunching] = useState(false)
+  const [isWalletConnected, setIsWalletConnected] = useState(false)
+  const [walletAddress, setWalletAddress] = useState('')
   const launchParamsRef = useRef<HTMLDivElement>(null)
   const memeRecipeRef = useRef<HTMLDivElement>(null)
   const [name, setName] = useState('')
@@ -202,6 +204,13 @@ const App = (): React.JSX.Element => {
         })
       }
     }, 100)
+  }
+
+  const connectWallet = (e: React.FormEvent): void => {
+    e.preventDefault()
+    const simulatedAddress = '0x742d35Cc6634C0532925a3b844Bc454e4438f44e'
+    setWalletAddress(simulatedAddress)
+    setIsWalletConnected(true)
   }
 
   const handleLaunch = (e: React.FormEvent): void => {
@@ -450,14 +459,35 @@ const App = (): React.JSX.Element => {
                         <NumberInputField />
                       </NumberInput>
                     </FormControl>
-                    <Button type="submit" colorScheme="purple">Launch Coin</Button>
+                    <HStack spacing={4} justify="space-between">
+                      <Button
+                        colorScheme="purple"
+                        onClick={connectWallet}
+                        flex="1"
+                      >
+                        Connect Wallet
+                      </Button>
+                      <Button
+                        type="submit"
+                        colorScheme="purple"
+                        onClick={handleLaunch}
+                        flex="1"
+                      >
+                        Launch Coin
+                      </Button>
+                    </HStack>
+                    {isWalletConnected && (
+                      <Text fontSize="sm" color="green.500" textAlign="center">
+                        Wallet Connected: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+                      </Text>
+                    )}
                   </VStack>
                 </form>
               </Box>
             )}
           </VStack>
         </Container>
-        <Text fontSize="sm" color="gray.500" mt={8} textAlign="center">
+        <Text fontSize="sm" color="gray.500" mt={8} mb={8} textAlign="center">
           AI sometimes generates inaccurate info, so double-check responses.{' '}
         </Text>
       </Box>
