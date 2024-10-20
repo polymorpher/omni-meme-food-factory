@@ -1,3 +1,5 @@
+![omni-image-aa-cropped](https://github.com/user-attachments/assets/136ab09d-d936-4c2b-886b-076405d3a769)
+
 ## Omni Meme Food Factory
 
 Launch your own AI-powered food meme coin as Omni Fungible Token (OFT) on 70+ chains in ONE click(*), made possible by LayerZero V2
