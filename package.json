@@ -19,6 +19,7 @@
         "ethers": "^5",
         "framer-motion": "^10.3.2",
         "lodash": "^4.17.21",
+        "lucide-react": "^0.453.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "react-hook-form": "^7.43.7",
