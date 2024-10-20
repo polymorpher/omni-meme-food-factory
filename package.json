@@ -10,13 +10,12 @@
         "lint": "eslint src --ext .js,.jsx,.ts,.tsx --fix"
     },
     "dependencies": {
-        "@chakra-ui/hooks": "^2.2.1",
-        "@chakra-ui/react": "^2.8.2",
+        "@chakra-ui/hooks": "^2.4.2",
+        "@chakra-ui/react": "^2.10.3",
         "@emotion/react": "^11.10.6",
         "@emotion/styled": "^11.10.6",
-        "@wagmi/core": "^0.10.17",
-        "axios": "^1.7.2",
-        "ethers": "^5",
+        "@wagmi/core": "^2.13.9",
+        "axios": "^1.7.7",
         "framer-motion": "^10.3.2",
         "lodash": "^4.17.21",
         "lucide-react": "^0.453.0",
@@ -24,8 +23,8 @@
         "react-dom": "^18.2.0",
         "react-hook-form": "^7.43.7",
         "react-router-dom": "^6.27.0",
-        "viem": "^1.0.0",
-        "wagmi": "^0.12.19"
+        "viem": "^2.21.30",
+        "wagmi": "^2.12.20"
     },
     "devDependencies": {
         "@types/react": "^18.0.27",
@@ -33,7 +32,6 @@
         "@typescript-eslint/eslint-plugin": "^5.62.0",
         "@typescript-eslint/parser": "^5.62.0",
         "@vitejs/plugin-react": "^4.3.3",
-        "abitype": "^0.7.1",
         "eslint": "^8.57.1",
         "eslint-config-react-app": "^7.0.1",
         "eslint-config-standard-with-typescript": "^34.0.1",
@@ -41,7 +39,7 @@
         "eslint-plugin-n": "^15.7.0",
         "eslint-plugin-promise": "^6.1.1",
         "eslint-plugin-react-hooks": "^4.6.0",
-        "typescript": "^5.4.5",
+        "typescript": "^5.5.3",
         "vite": "^5.3.1",
         "vite-plugin-eslint": "^1.8.1"
     }

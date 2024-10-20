@@ -25,7 +25,7 @@ Follow these steps to set up and run the project:
    python3 -m venv myenv
    source myenv/bin/activate
 
-   pip install Flask[async] Flask-CORS openai google-cloud-storage python-dotenv aiohttp aiofiles hypercorn eth-utils
+   pip install "Flask[async]" Flask-CORS openai google-cloud-storage python-dotenv aiohttp aiofiles hypercorn eth-utils
    ```
 
 3. **Authenticate with Google Cloud**
