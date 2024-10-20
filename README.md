@@ -41,14 +41,16 @@ BASE_URL=...
 See forge deployment scripts in `deploy.sh`, `deploy-base.sh`, `deploy-polygon.sh`.
 
 ### FoodMemeFactory
-Harmony: 0x210f49e4de7e0f41b5a64f8fb4597b822fd733eb
-Polygon: 0xa590e50486b68043e658ba4263c1bd84172c6150
-Base: 0xa590e50486B68043e658bA4263C1BD84172c6150
+
+- Harmony: 0x210f49e4de7e0f41b5a64f8fb4597b822fd733eb
+- Polygon: 0xa590e50486b68043e658ba4263c1bd84172c6150
+- Base: 0xa590e50486B68043e658bA4263C1BD84172c6150
 
 ### FoodMemeFactoryHelper
-Harmony: 0xB3D8d33D6414a4c996C7ADaf9b14414F7c229fD1
-Polygon: 0x821ad3a00e6ebe7873c40a0b30d24331ac1f8e0f
-Base: 0x821ad3a00e6ebe7873c40a0b30d24331ac1f8e0f
+
+- Harmony: 0xB3D8d33D6414a4c996C7ADaf9b14414F7c229fD1
+- Polygon: 0x821ad3a00e6ebe7873c40a0b30d24331ac1f8e0f
+- Base: 0x821ad3a00e6ebe7873c40a0b30d24331ac1f8e0f
 
 ## Screenshots
 
