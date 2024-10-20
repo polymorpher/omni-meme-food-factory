@@ -21,7 +21,7 @@ library Utils {
 
     struct LzParams {
         uint32[] endPointIds;
-        bytes32[] deployedContracts; // addresses in bytes32 form to accommodate non-EVM chains
+        bytes32[] remoteContractAddresses; // addresses in bytes32 form to accommodate non-EVM chains
         address[] sendLibraries;
         address[] receiveLibraries;
         uint256[] gracePeriods;

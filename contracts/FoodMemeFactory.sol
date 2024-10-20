@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: CC-BY-NC-4.0
 pragma solidity ^0.8.26;
 
-import "./FactoryHelper.sol";
-
 // can't use it because Ownable set initial owner in its constructor. duh.
 //import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 
@@ -11,6 +9,7 @@ import "@layerzerolabs/oapp-evm/interfaces/IOAppOptionsType3.sol";
 import {Create2} from "@openzeppelin/contracts/utils/Create2.sol";
 import {Create2} from "@openzeppelin/contracts/utils/Create2.sol";
 import {FoodMeme} from "./FoodMeme.sol";
+import {FoodMemeFactoryHelper} from "./FoodMemeFactoryHelper.sol";
 import {IOAppOptionsType3} from "@layerzerolabs/oapp-evm/interfaces/IOAppOptionsType3.sol";
 import {OptionsBuilder} from "@layerzerolabs/oapp-evm/libs/OptionsBuilder.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
@@ -76,9 +75,10 @@ contract FoodMemeFactory is Ownable {
         f.initialize(maker, initParams);
     }
 
+    // called after contracts are deployed in local chain and in all remote chains
     function setupLz(FoodMeme f, Utils.LzParams memory params) internal {
         require(msg.sender == owner() || f.hasRole(f.ROLE_MAKER(), msg.sender), "Unauthorized");
-        require(params.endPointIds.length == params.deployedContracts.length, "Bad lz params");
+        require(params.endPointIds.length == params.remoteContractAddresses.length, "Bad lz params");
         require(params.endPointIds.length == params.receiveLibraries.length, "Bad lz params");
         require(params.endPointIds.length == params.sendLibraries.length, "Bad lz params");
         require(params.endPointIds.length == params.sendConfigParams.length, "Bad lz params");
@@ -87,7 +87,7 @@ contract FoodMemeFactory is Ownable {
         require(params.endPointIds.length == params.minGasEnforceConfig.length, "Bad lz params");
 
         for (uint256 i = 0; i < params.endPointIds.length; i++) {
-            f.setPeer(params.endPointIds[i], params.deployedContracts[i]);
+            f.setPeer(params.endPointIds[i], params.remoteContractAddresses[i]);
             if (params.receiveLibraries.length > i) {
                 f.endpoint().setReceiveLibrary(
                     address(f), params.endPointIds[i], params.receiveLibraries[i], params.gracePeriods[i]

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: CC-BY-NC-4.0
+pragma solidity ^0.8.26;
 import {FoodMeme} from "./FoodMeme.sol";
 
 contract FoodMemeFactoryHelper {
