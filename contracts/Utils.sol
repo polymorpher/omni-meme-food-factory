@@ -9,6 +9,8 @@ library Utils {
     }
 
     struct InitParams {
+        bool mintable;
+        uint256 masterChain;
         uint256 maxSupply;
         uint256 maxPerMint;
         uint256 minReviewThreshold;
