@@ -19,10 +19,10 @@ import {OFTComposeMsgCodec} from "@layerzerolabs/oft-evm/libs/OFTComposeMsgCodec
 // DevTools imports
 import {TestHelperOz5} from "@layerzerolabs/test-devtools-evm-foundry/contracts/TestHelperOz5.sol";
 
-
 contract FoodMemeFactoryTest is TestHelperOz5 {
     uint256 DEPLOYER_PRIVATE_KEY = vm.envUint("DEPLOYER_PRIVATE_KEY");
     address deployer = vm.addr(DEPLOYER_PRIVATE_KEY);
+
     using OptionsBuilder for bytes;
 
     uint32 private aEid = 1;
@@ -180,29 +180,29 @@ contract FoodMemeFactoryTest is TestHelperOz5 {
         assertEq(aOFT.token(), address(aOFT));
         assertEq(bOFT.token(), address(bOFT));
     }
-//
-//    function test_send_oft() public {
-//        uint256 tokensToSend = 1 ether;
-//        bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200000, 0);
-//        SendParam memory sendParam = SendParam(
-//            bEid,
-//            addressToBytes32(userB),
-//            tokensToSend,
-//            tokensToSend,
-//            options,
-//            "",
-//            ""
-//        );
-//        MessagingFee memory fee = aOFT.quoteSend(sendParam, false);
-//
-//        assertEq(aOFT.balanceOf(userA), initialBalance);
-//        assertEq(bOFT.balanceOf(userB), initialBalance);
-//
-//        vm.prank(userA);
-//        aOFT.send{value: fee.nativeFee}(sendParam, fee, payable(address(this)));
-//        verifyPackets(bEid, addressToBytes32(address(bOFT)));
-//
-//        assertEq(aOFT.balanceOf(userA), initialBalance - tokensToSend);
-//        assertEq(bOFT.balanceOf(userB), initialBalance + tokensToSend);
-//    }
+    //
+    //    function test_send_oft() public {
+    //        uint256 tokensToSend = 1 ether;
+    //        bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200000, 0);
+    //        SendParam memory sendParam = SendParam(
+    //            bEid,
+    //            addressToBytes32(userB),
+    //            tokensToSend,
+    //            tokensToSend,
+    //            options,
+    //            "",
+    //            ""
+    //        );
+    //        MessagingFee memory fee = aOFT.quoteSend(sendParam, false);
+    //
+    //        assertEq(aOFT.balanceOf(userA), initialBalance);
+    //        assertEq(bOFT.balanceOf(userB), initialBalance);
+    //
+    //        vm.prank(userA);
+    //        aOFT.send{value: fee.nativeFee}(sendParam, fee, payable(address(this)));
+    //        verifyPackets(bEid, addressToBytes32(address(bOFT)));
+    //
+    //        assertEq(aOFT.balanceOf(userA), initialBalance - tokensToSend);
+    //        assertEq(bOFT.balanceOf(userB), initialBalance + tokensToSend);
+    //    }
 }
