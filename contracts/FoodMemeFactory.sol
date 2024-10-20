@@ -24,20 +24,20 @@ contract FoodMemeFactory is Ownable {
         FOOD_MEME_REF = _food_meme_ref;
     }
 
-    function setBaseUrl(address _baseUrl) external onlyOwner {
+    function setBaseUrl(string memory _baseUrl) external onlyOwner {
         baseUrl = _baseUrl;
     }
 
     function predictAddress(Utils.MemeParams memory params) external view returns (address) {
-        bytes32 salt = keccak256(params.name, params.symbol, baseUrl, FOOD_MEME_REF);
+        bytes32 salt = keccak256(abi.encodePacked(params.name, params.symbol, baseUrl, FOOD_MEME_REF));
         bytes memory args = abi.encode(params.name, params.symbol, params.endpoint, owner());
-        return Clones.predictDeterministicAddressWithImmutableArgs(FOOD_MEME_REF, args, salt, address(this));
+        return FOOD_MEME_REF.predictDeterministicAddressWithImmutableArgs(args, salt, address(this));
     }
 
     function launch(Utils.MemeParams memory params) external {
-        bytes32 salt = keccak256(params.name, params.symbol, baseUrl, FOOD_MEME_REF);
+        bytes32 salt = keccak256(abi.encodePacked(params.name, params.symbol, baseUrl, FOOD_MEME_REF));
         bytes memory args = abi.encode(params.name, params.symbol, params.endpoint, owner());
-        address instance = FOOD_MEME_REF.cloneDeterministicWithImmutableArgs(FOOD_MEME_REF, args, salt);
+        address instance = FOOD_MEME_REF.cloneDeterministicWithImmutableArgs(args, salt);
         emit MemeLaunched(params.name, params.symbol, instance, msg.sender);
     }
 }
