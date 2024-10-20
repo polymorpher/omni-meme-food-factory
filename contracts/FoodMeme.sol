@@ -32,18 +32,16 @@ contract FoodMeme is MemeMetadata, OFT, AccessControl {
 
     uint256 unlockTime;
 
-    constructor(
-        string memory _name,
-        string memory _symbol,
-        address _lzEndpoint,
-        address _delegate
-    ) OFT(_name, _symbol, _lzEndpoint, _delegate) Ownable(_delegate) {
+    constructor(string memory _name, string memory _symbol, address _lzEndpoint, address _delegate)
+        OFT(_name, _symbol, _lzEndpoint, _delegate)
+        Ownable(_delegate)
+    {
         _grantRole(DEFAULT_ADMIN_ROLE, _delegate);
         _grantRole(ROLE_FACTORY, msg.sender);
         _grantRole(ROLE_MAKER, msg.sender);
     }
 
-    modifier initializer(){
+    modifier initializer() {
         require(!initialized);
         _;
         initialized = true;
@@ -76,11 +74,11 @@ contract FoodMeme is MemeMetadata, OFT, AccessControl {
         maxPerMint = _maxPerMint;
     }
 
-    function setPriceSettings(Utils.PriceSettings memory _priceSettings) public onlyRole(ROLE_MAKER){
+    function setPriceSettings(Utils.PriceSettings memory _priceSettings) public onlyRole(ROLE_MAKER) {
         priceSettings = _priceSettings;
     }
 
-    function mint(uint256 quantity, address recipient) payable external {
+    function mint(uint256 quantity, address recipient) external payable {
         if (totalSupply() + quantity > maxSupply) {
             revert MaxSupplyExceeded();
         }
