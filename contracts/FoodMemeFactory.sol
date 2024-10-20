@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: CC-BY-NC-4.0
-pragma solidity ^0.8.28;
+pragma solidity ^0.8.26;
 
 import {FoodMeme} from "./FoodMeme.sol";
 import {Utils} from "./Utils.sol";
-import {ERC20} from "@openzeppelin/contracts/access/Ownable.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 
 contract FoodMemeFactory is Ownable {
@@ -20,23 +20,23 @@ contract FoodMemeFactory is Ownable {
         baseUrl = _baseUrl;
     }
 
-    function setRef(address _food_meme_ref) onlyOwner {
+    function setRef(address _food_meme_ref) external onlyOwner {
         FOOD_MEME_REF = _food_meme_ref;
     }
 
-    function setBaseUrl(address _baseUrl) onlyOwner {
+    function setBaseUrl(address _baseUrl) external onlyOwner {
         baseUrl = _baseUrl;
     }
 
-    function predictAddress(Utils.MemeParams memory params) external view  returns (address) {
+    function predictAddress(Utils.MemeParams memory params) external view returns (address) {
         bytes32 salt = keccak256(params.name, params.symbol, baseUrl, FOOD_MEME_REF);
-        bytes memory args = abi.encode(params.name, params.symbol, params.endpoint, _owner);
+        bytes memory args = abi.encode(params.name, params.symbol, params.endpoint, owner());
         return Clones.predictDeterministicAddressWithImmutableArgs(FOOD_MEME_REF, args, salt, address(this));
     }
 
     function launch(Utils.MemeParams memory params) external {
         bytes32 salt = keccak256(params.name, params.symbol, baseUrl, FOOD_MEME_REF);
-        bytes memory args = abi.encode(params.name, params.symbol, params.endpoint, _owner);
+        bytes memory args = abi.encode(params.name, params.symbol, params.endpoint, owner());
         address instance = FOOD_MEME_REF.cloneDeterministicWithImmutableArgs(FOOD_MEME_REF, args, salt);
         emit MemeLaunched(params.name, params.symbol, instance, msg.sender);
     }
