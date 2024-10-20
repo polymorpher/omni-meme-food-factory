@@ -1,9 +1,9 @@
 import os
 import base64
 import uuid
-import threading
 import requests
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from openai import OpenAI
 from google.cloud import storage
 from dotenv import load_dotenv
@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
 
 # Initialize OpenAI client
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -90,12 +91,10 @@ def generate_and_upload():
 
     temp_filename = f"temp_image_{destination_blob_name}"
 
-    # Start a new thread for uploading
-    threading.Thread(target=process_image, args=(response_format, res, bucket_name, temp_filename, destination_blob_name)).start()
-
+    process_image(response_format, res, bucket_name, temp_filename, destination_blob_name)
     return jsonify({
         "message": "Image generated successfully. Upload started.",
-        "gcs_path": f"gs://{bucket_name}/{destination_blob_name}"
+        "url_path": f"https://storage.cloud.google.com/{bucket_name}/temp_image_{destination_blob_name}"
     })
 
 if __name__ == '__main__':

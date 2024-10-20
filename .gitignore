@@ -14,5 +14,6 @@ docs/
 .env
 .vscode
 
+/server/myenv
 node_modules
 

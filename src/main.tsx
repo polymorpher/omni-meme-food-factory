@@ -1,6 +1,21 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom/client'
-import { ChakraProvider, Box, VStack, Heading, Text, Button, Input, HStack, Link, Container, FormControl, IconButton, Tooltip } from '@chakra-ui/react'
+import {
+  ChakraProvider,
+  Box,
+  VStack,
+  Heading,
+  Text,
+  Button,
+  Input,
+  HStack,
+  Container,
+  FormControl,
+  IconButton,
+  Tooltip,
+  useToast,
+  Image as ChakraImage
+} from '@chakra-ui/react'
 import { Image, Sparkles } from 'lucide-react'
 import { createPublicClient, http } from 'viem'
 import { mainnet } from 'viem/chains'
@@ -10,18 +25,60 @@ const client = createPublicClient({
   transport: http()
 })
 
+interface MemeResponse {
+  message: string
+  url_path: string
+}
+
 const App = (): React.JSX.Element => {
   const [prompt, setPrompt] = useState('')
+  const [urlPath, setUrlPath] = useState('')
+  const toast = useToast()
 
-  const handleInitialSubmit = async (e: React.FormEvent): Promise<void> => {
+  const generateMeme = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault()
     console.log('Submitted prompt:', prompt)
 
     try {
       const blockNumber = await client.getBlockNumber()
       console.log('Current block number:', blockNumber)
+
+      // Make API call to generate meme
+      const response = await fetch('http://127.0.0.1:5000/generate-and-upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt,
+          size: '1024x1024',
+          quality: 'standard',
+          n: 1,
+          response_format: 'url'
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to generate meme')
+      }
+
+      const data: MemeResponse = await response.json()
+      setUrlPath(data.url_path)
+
+      toast({
+        title: 'Meme generated',
+        description: data.message,
+        status: 'success',
+        duration: 3000,
+        isClosable: true
+      })
     } catch (error) {
-      console.error('Error fetching block number:', error)
+      console.error('Error:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to generate meme. Please try again.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true
+      })
     }
   }
 
@@ -58,7 +115,7 @@ const App = (): React.JSX.Element => {
               Hello, Yanhe!
             </Heading>
             <Text fontSize="md" color="gray.600" textAlign="center">
-              I will provide some example prompt for generating food meme coin.
+              I will provide some example prompts for generating food meme coins.
             </Text>
             <HStack spacing={4}>
               <Button
@@ -78,13 +135,11 @@ const App = (): React.JSX.Element => {
                 Hainanese Chicken Rice
               </Button>
             </HStack>
-            <FormControl as="form" onSubmit={handleInitialSubmit}>
+            <FormControl as="form" onSubmit={generateMeme}>
               <HStack>
                 <Input
                   value={prompt}
-                  onChange={
-                    (e) => { setPrompt(e.target.value) }
-                  }
+                  onChange={(e) => { setPrompt(e.target.value) }}
                   placeholder="Enter your food prompt here"
                   borderRadius="full"
                 />
@@ -106,6 +161,12 @@ const App = (): React.JSX.Element => {
                 </Tooltip>
               </HStack>
             </FormControl>
+            {urlPath && (
+              <Box mt={4}>
+                <Text mb={2}>Meme generated and uploaded successfully!</Text>
+                <ChakraImage src={urlPath} alt="Generated Meme" maxW="100%" borderRadius="md" />
+              </Box>
+            )}
           </VStack>
         </Container>
         <Text fontSize="sm" color="gray.500" mt={8} textAlign="center">

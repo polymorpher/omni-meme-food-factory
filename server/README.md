@@ -21,7 +21,11 @@ Follow these steps to set up and run the project:
    Run the following command to install the required Python packages:
 
    ```
-   pip install flask openai python-dotenv google-cloud-storage requests
+   // optional for creating a vertual env
+   python3 -m venv myenv
+   source myenv/bin/activate
+
+   pip install flask flask-cors openai python-dotenv google-cloud-storage requests
    ```
 
 3. **Authenticate with Google Cloud**
@@ -99,9 +103,9 @@ Both request types will receive the same response structure:
 ```json
 {
   "message": "Image generated successfully. Upload started.",
-  "gcs_path": "gs://omni-meme-food-factory/unique-filename.png"
+  "url_path": "https://storage.cloud.google.com/omni-meme-food-factory/unique-filename.png"
 }
 ```
 
 - `message`: A status message indicating that the image generation was successful and the upload process has begun.
-- `gcs_path`: The Google Cloud Storage path where the image will be stored once the upload is complete.
+- `url_path`: The Google Cloud Storage path where the image will be stored once the upload is complete.
