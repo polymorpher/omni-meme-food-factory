@@ -66,18 +66,18 @@ library Utils {
     }
 
     // TODO: check for risk of arithmetic error here. Probably switch to Q64 or Q96
-    function computeUnitPrice(PriceSettings memory s, uint256 quantity, uint256 supply)
-        internal
-        pure
-        returns (uint256)
+    function computeUnitPrice(PriceSettings memory s, uint256 quantity, uint256 supply, uint256 maxSupply)
+    internal
+    pure
+    returns (uint256)
     {
         if (s.mode == PriceMode.ConstantPrice) {
             return s.c;
         } else if (s.mode == PriceMode.LinearPrice) {
-            return s.b * (quantity + supply) + s.c;
+            return s.b * (quantity + supply) / maxSupply / DECIMALS + s.c / DECIMALS;
         }
         uint256 newSupply = quantity + supply;
-        return s.a * s.a * newSupply + s.b * newSupply + s.c;
+        return s.a * s.a * newSupply / DECIMALS / maxSupply / DECIMALS + s.b * newSupply / maxSupply / DECIMALS + s.c / DECIMALS;
     }
 
     struct Review {

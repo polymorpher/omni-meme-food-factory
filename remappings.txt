@@ -11,3 +11,5 @@ openzeppelin-contracts/=lib/openzeppelin-contracts/
 solidity-bytes-utils/=lib/solidity-bytes-utils/
 
 @layerzerolabs/lz-evm-messagelib-v2/=lib/layerzero-v2/packages/layerzero-v2/evm/messagelib/
+@layerzerolabs/test-devtools-evm-foundry=lib/devtools/packages/test-devtools-evm-foundry/
+@layerzerolabs/lz-evm-v1-0.7/contracts/interfaces/=test/mock/

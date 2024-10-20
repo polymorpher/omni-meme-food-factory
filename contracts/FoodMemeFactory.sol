@@ -59,8 +59,9 @@ contract FoodMemeFactory is Ownable {
     }
 
     function launch(Utils.MemeParams memory params, address maker, Utils.InitParams memory initParams)
-        external
-        payable
+    external
+    payable
+    returns (FoodMeme)
     {
         if (msg.value < launchFee) {
             revert InsufficientLaunchFee();
@@ -72,19 +73,23 @@ contract FoodMemeFactory is Ownable {
         address instance = Create2.deploy(0, salt, abi.encodePacked(helper.code(args)));
         emit MemeLaunched(params.name, params.symbol, instance, msg.sender);
         FoodMeme f = FoodMeme(instance);
+        if (bytes(initParams.baseUri).length == 0) {
+            initParams.baseUri = baseUrl;
+        }
         f.initialize(maker, initParams);
+        return f;
     }
 
     // called after contracts are deployed in local chain and in all remote chains
-    function setupLz(FoodMeme f, Utils.LzParams memory params) internal {
+    function setupLz(FoodMeme f, Utils.LzParams memory params) external {
         require(msg.sender == owner() || f.hasRole(f.ROLE_MAKER(), msg.sender), "Unauthorized");
         require(params.endPointIds.length == params.remoteContractAddresses.length, "Bad lz params");
-        require(params.endPointIds.length == params.receiveLibraries.length, "Bad lz params");
-        require(params.endPointIds.length == params.sendLibraries.length, "Bad lz params");
-        require(params.endPointIds.length == params.sendConfigParams.length, "Bad lz params");
-        require(params.endPointIds.length == params.receiveConfigParams.length, "Bad lz params");
-        require(params.endPointIds.length == params.enforceConfigParams.length, "Bad lz params");
-        require(params.endPointIds.length == params.minGasEnforceConfig.length, "Bad lz params");
+//        require(params.endPointIds.length == params.receiveLibraries.length, "Bad lz params");
+//        require(params.endPointIds.length == params.sendLibraries.length, "Bad lz params");
+//        require(params.endPointIds.length == params.sendConfigParams.length, "Bad lz params");
+//        require(params.endPointIds.length == params.receiveConfigParams.length, "Bad lz params");
+//        require(params.endPointIds.length == params.enforceConfigParams.length, "Bad lz params");
+//        require(params.endPointIds.length == params.minGasEnforceConfig.length, "Bad lz params");
 
         for (uint256 i = 0; i < params.endPointIds.length; i++) {
             f.setPeer(params.endPointIds[i], params.remoteContractAddresses[i]);
@@ -96,13 +101,13 @@ contract FoodMemeFactory is Ownable {
             if (params.sendLibraries.length > i) {
                 f.endpoint().setSendLibrary(address(f), params.endPointIds[i], params.sendLibraries[i]);
             }
-            if (params.sendConfigParams[i].config.length > 0) {
+            if (params.sendConfigParams.length > i && params.sendConfigParams[i].config.length > 0) {
                 f.endpoint().setConfig(address(f), params.sendLibraries[i], params.sendConfigParams[i].config);
             }
-            if (params.receiveConfigParams[i].config.length > 0) {
+            if (params.receiveConfigParams.length > i && params.receiveConfigParams[i].config.length > 0) {
                 f.endpoint().setConfig(address(f), params.receiveLibraries[i], params.receiveConfigParams[i].config);
             }
-            if (params.minGasEnforceConfig[i] > 0) {
+            if (params.minGasEnforceConfig.length > i && params.minGasEnforceConfig[i] > 0) {
                 EnforcedOptionParam memory p = EnforcedOptionParam({
                     eid: params.endPointIds[i],
                     msgType: 1, // OFTCore.SEND,
@@ -112,7 +117,7 @@ contract FoodMemeFactory is Ownable {
                 pp[0] = p;
                 f.setEnforcedOptions(pp);
             }
-            if (params.enforceConfigParams[i].config.length > 0) {
+            if (params.enforceConfigParams.length > i && params.enforceConfigParams[i].config.length > 0) {
                 f.setEnforcedOptions(params.enforceConfigParams[i].config);
             }
         }
