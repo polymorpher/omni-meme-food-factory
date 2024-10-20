@@ -53,21 +53,21 @@ Base: 0x821ad3a00e6ebe7873c40a0b30d24331ac1f8e0f
 ## Screenshots
 
 
-<img width="1714" alt="Screenshot 2024-10-20 at 8 23 06 AM" src="https://github.com/user-attachments/assets/c469f8ab-c988-460f-b3b3-2a68054be272">
+<img width="100%" alt="Screenshot 2024-10-20 at 8 23 06 AM" src="https://github.com/user-attachments/assets/c469f8ab-c988-460f-b3b3-2a68054be272">
 
 --------------
 
-<img width="1317" alt="Screenshot 2024-10-20 at 8 44 24 AM" src="https://github.com/user-attachments/assets/74068772-8c64-49e3-8a86-820fed97d629">
+<img width="100%" alt="Screenshot 2024-10-20 at 8 44 24 AM" src="https://github.com/user-attachments/assets/74068772-8c64-49e3-8a86-820fed97d629">
 
 --------------
 
-<img width="1223" alt="Screenshot 2024-10-20 at 8 44 34 AM" src="https://github.com/user-attachments/assets/6aafbc44-5624-4b5a-be35-02657a261a6c">
+<img width="100%" alt="Screenshot 2024-10-20 at 8 44 34 AM" src="https://github.com/user-attachments/assets/6aafbc44-5624-4b5a-be35-02657a261a6c">
 
 --------------
 
-<img width="1715" alt="Screenshot 2024-10-20 at 8 24 38 AM" src="https://github.com/user-attachments/assets/692dad49-9aba-44a2-8d07-dbfed4519d2c">
+<img width="100%" alt="Screenshot 2024-10-20 at 8 24 38 AM" src="https://github.com/user-attachments/assets/692dad49-9aba-44a2-8d07-dbfed4519d2c">
 
 --------------
 
-<img width="1719" alt="Screenshot 2024-10-20 at 8 24 46 AM" src="https://github.com/user-attachments/assets/dcab55a5-51de-42ae-8f93-28030ff3676e">
+<img width="100%" alt="Screenshot 2024-10-20 at 8 24 46 AM" src="https://github.com/user-attachments/assets/dcab55a5-51de-42ae-8f93-28030ff3676e">
 
