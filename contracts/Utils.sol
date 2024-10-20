@@ -8,13 +8,17 @@ library Utils {
         address endpoint;
     }
     // https://docs.layerzero.network/v2/developers/evm/oft/quickstart#token-supply-cap
+
     uint256 constant OTF_MAX_SUPPLY = 18_446_744_073_709;
-    enum PriceMode{
+
+    enum PriceMode {
         // x = currentSupply + mintQuantity
-        ConstantPrice,  // unitPrice = c
-        LinearPrice,  // unitPrice =  b * x + c
-        QuadraticPrice  // unitPrice = a * a * x + b * x + c
+        ConstantPrice, // unitPrice = c
+        LinearPrice, // unitPrice =  b * x + c
+        QuadraticPrice // unitPrice = a * a * x + b * x + c
+
     }
+
     struct PriceSettings {
         PriceMode mode;
         uint256 a;
@@ -23,7 +27,11 @@ library Utils {
     }
 
     // TODO: check for risk of arithmetic error here. Probably switch to Q64 or Q96
-    function computeUnitPrice(PriceSettings memory s, uint256 quantity, uint256 supply) internal pure returns (uint256){
+    function computeUnitPrice(PriceSettings memory s, uint256 quantity, uint256 supply)
+        internal
+        pure
+        returns (uint256)
+    {
         if (s.mode == PriceMode.ConstantPrice) {
             return s.c;
         } else if (s.mode == PriceMode.LinearPrice) {

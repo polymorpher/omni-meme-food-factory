@@ -7,7 +7,6 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 
 contract FoodMemeFactory is Ownable {
-
     using Clones for address;
 
     address FOOD_MEME_REF;
