@@ -11,6 +11,8 @@ library Utils {
 
     uint256 constant OTF_MAX_SUPPLY = 18_446_744_073_709;
 
+    uint256 constant DECIMALS = 10_000;
+
     enum PriceMode {
         // x = currentSupply + mintQuantity
         ConstantPrice, // unitPrice = c
@@ -39,5 +41,11 @@ library Utils {
         }
         uint256 newSupply = quantity + supply;
         return s.a * s.a * newSupply + s.b * newSupply + s.c;
+    }
+
+    struct Review {
+        bytes32 hash;
+        uint8 rating;
+        uint256 balance;
     }
 }

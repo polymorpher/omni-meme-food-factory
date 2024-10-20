@@ -11,10 +11,15 @@ contract FoodMeme is MemeMetadata, OFT, AccessControl {
     string public contractURI;
     bool public initialized;
 
+    mapping(address => Utils.Review) public reviews;
+    uint256 public numReviewers;
+    uint256 public ratingTotal;
+
     // TODO: this is local to the current chain. We should sync global max supply
     uint256 public maxSupply = 1_000_000_000 * 1e18;
 
     uint256 public maxPerMint = 100 * 1e18;
+    uint256 public minReviewThreshold = 5 * 1e18;
 
     // TOOD: this is local to the current chain. We should have some globally synced, oracle-based dynamic price adjustment mechanism later
     Utils.PriceSettings public priceSettings;
@@ -26,7 +31,9 @@ contract FoodMeme is MemeMetadata, OFT, AccessControl {
     error AlreadyUnlocked();
     error InsufficientPayment();
     error MaxSupplyExceeded();
+    error BelowMinReviewThreshold();
     error PerMintAmountExceeded();
+    error NoReview();
 
     event EarlyUnlock(uint256 previousUnlockTime);
 
@@ -74,6 +81,10 @@ contract FoodMeme is MemeMetadata, OFT, AccessControl {
         maxPerMint = _maxPerMint;
     }
 
+    function setMinReviewThreshold(uint256 _minReviewThreshold) public onlyRole(ROLE_MAKER) {
+        minReviewThreshold = _minReviewThreshold;
+    }
+
     function setPriceSettings(Utils.PriceSettings memory _priceSettings) public onlyRole(ROLE_MAKER) {
         priceSettings = _priceSettings;
     }
@@ -90,5 +101,38 @@ contract FoodMeme is MemeMetadata, OFT, AccessControl {
             revert InsufficientPayment();
         }
         _mint(recipient, quantity);
+    }
+
+    function hasReviewed(address user) public view returns (bool) {
+        return uint256(reviews[msg.sender].hash) == 0 && reviews[msg.sender].rating == 0;
+    }
+
+    function review(Utils.Review memory r) external {
+        if (balanceOf(msg.sender) < minReviewThreshold) {
+            revert BelowMinReviewThreshold();
+        }
+        if (!hasReviewed(msg.sender)) {
+            ratingTotal += r.rating;
+            numReviewers += 1;
+        } else {
+            ratingTotal -= reviews[msg.sender].rating;
+            ratingTotal += r.rating;
+        }
+        reviews[msg.sender] = r;
+    }
+
+    function deleteReview() external {
+        if (!hasReviewed(msg.sender)) {
+            revert NoReview();
+        }
+        delete reviews[msg.sender];
+        numReviewers -= 1;
+    }
+
+    function getAverageRating() external view returns (uint256) {
+        if (numReviewers == 0) {
+            return 0;
+        }
+        return ratingTotal * Utils.DECIMALS / numReviewers / 255;
     }
 }
