@@ -114,8 +114,8 @@ const Mint = (): React.JSX.Element => {
       { chain: 'Harmony', balance: '1000 ONE' }
     ])
     setReviews([
-      { userAddress: '0x1234...5678', text: 'Great service!' },
-      { userAddress: '0xabcd...efgh', text: 'Fast and efficient.' }
+      { userAddress: '0x1234...5678', text: 'Hands down, the best food in Singapore!' },
+      { userAddress: '0xabcd...efgh', text: 'I could eat this for the rest of my life.' }
     ])
   }, [address, getAddressInfo])
 
