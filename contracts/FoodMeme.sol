@@ -43,8 +43,8 @@ contract FoodMeme is MemeMetadata, OFT, AccessControl {
     uint256 unlockTime;
 
     constructor(string memory _name, string memory _symbol, address _lzEndpoint, address _delegate)
-    OFT(_name, _symbol, _lzEndpoint, _delegate)
-    Ownable(_delegate)
+        OFT(_name, _symbol, _lzEndpoint, _delegate)
+        Ownable(_delegate)
     {
         _grantRole(DEFAULT_ADMIN_ROLE, _delegate);
         _grantRole(ROLE_FACTORY, msg.sender);

@@ -38,9 +38,9 @@ library Utils {
 
     // TODO: check for risk of arithmetic error here. Probably switch to Q64 or Q96
     function computeUnitPrice(PriceSettings memory s, uint256 quantity, uint256 supply)
-    internal
-    pure
-    returns (uint256)
+        internal
+        pure
+        returns (uint256)
     {
         if (s.mode == PriceMode.ConstantPrice) {
             return s.c;
