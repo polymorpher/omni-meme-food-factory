@@ -19,10 +19,9 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
 
 class ReviewData:
-    def __init__(self, hash_value, rating, balance):
-        self.hash = hash_value
-        self.rating = rating
-        self.balance = balance
+    def __init__(self, user_address, text):
+        self.user_address = user_address
+        self.text = text
 
 reviews = {}
 
@@ -108,6 +107,21 @@ async def process_image(response_format, res, bucket_name, destination_blob_name
     await upload_blob(bucket_name, temp_filename, destination_blob_name)
     return f"https://storage.cloud.google.com/{bucket_name}/{temp_filename}"
 
+def verify_keccak_hash(input_data, expected_hash):
+    if isinstance(input_data, str):
+        input_bytes = input_data.encode('utf-8')
+    elif isinstance(input_data, bytes):
+        input_bytes = input_data
+    else:
+        raise ValueError("Input must be string or bytes")
+    
+    calculated_hash = keccak(input_bytes)
+    calculated_hex = '0x' + binascii.hexlify(calculated_hash).decode('ascii')
+
+    if not expected_hash.startswith('0x'):
+        expected_hash = '0x' + expected_hash
+    return calculated_hex.lower() == expected_hash.lower()
+
 @app.route('/generate-and-upload', methods=['POST'])
 async def generate_and_upload():
     data = request.json
@@ -160,50 +174,34 @@ async def generate_recipe():
             "recipe": recipe,
         })
 
-@app.route('/reviews/<int:id>', methods=['GET'])
-def get_review(id):
-    if id in reviews:
-        review = reviews[id]
+@app.route('/reviews/<string:foodaddr>', methods=['GET'])
+def get_review(foodaddr):
+    if foodaddr in reviews:
+        review_list = [{"user_address": r.user_address, "text": r.text} for r in reviews[foodaddr]]
         return jsonify({
-            'id': id,
-            'hash': review.hash,
-            'rating': review.rating,
-            'balance': review.balance
+            'reviews': review_list
         }), 200
     return jsonify({'error': 'Review not found'}), 404
 
 @app.route('/review', methods=['POST'])
 def create_review():
     data = request.json
-    if not data or 'id' not in data:
-        return jsonify({'error': 'Invalid request. Must include id'}), 400
+    if not data or 'food_address' not in data or 'user_address' not in data:
+        return jsonify({'error': 'Invalid request. Must include food address or user address'}), 400
 
-    id = data['id']
-    hash_value = data.get('hash', '')
+    foodaddr = data.get('food_address')
+    useraddr = data.get('user_address')
+    text = data.get('text')
 
-    try:
-        hash_bytes = binascii.unhexlify(hash_value)
-        if len(hash_bytes) != 32:
-            raise ValueError("hash must be 32 bytes long")
-    except (ValueError, binascii.Error):
-        return jsonify({'error': 'Invalid hash. Must be a 64-character hex string representing 32 bytes'}), 400
+    # # need to call the ether to get the expected_hash
+    # is_valid = verify_keccak_hash(text, expected_hash)
+    # if not is_valid:
+    #     return jsonify({'error': 'Invalid text'}), 400
 
-    rating = data.get('rating', 0)
-    balance = data.get('balance', 0)
-
-    if not isinstance(rating, int) or rating < 0 or rating > 255:
-        return jsonify({'error': 'Invalid rating. Must be an integer between 0 and 255'}), 400
- 
-    if not isinstance(balance, int) or balance < 0:
-        return jsonify({'error': 'Invalid balance. Must be a non-negative integer'}), 400
-
-    reviews[id] = ReviewData(hash_value, rating, balance)
+    reviews.setdefault(foodaddr, []).append(ReviewData(user_address=useraddr, text=text))
 
     return jsonify({
-        'id': id,
-        'hash': hash_value,
-        'rating': rating,
-        'balance': balance
+        'message': 'Success'
     }), 201
 
 if __name__ == '__main__':
