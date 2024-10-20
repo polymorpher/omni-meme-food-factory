@@ -5,6 +5,5 @@ forge script script/DeployFoodMemeFactory.s.sol --rpc-url https://api.harmony.on
   --legacy \
   --broadcast \
   --private-key ${DEPLOYER_PRIVATE_KEY} \
-  -vv \
-  --resume
+  -vv
 
