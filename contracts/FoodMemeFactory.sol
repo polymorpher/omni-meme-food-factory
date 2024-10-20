@@ -6,6 +6,7 @@ import {Utils} from "./Utils.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 
+// TODO: we should make FoodMemeFactory an OApp, so it can receive lz messages cross-chain and act as a synchronizer can manipulate (sync) states with instance contracts
 contract FoodMemeFactory is Ownable {
     using Clones for address;
 

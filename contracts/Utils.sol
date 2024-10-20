@@ -10,11 +10,15 @@ library Utils {
 
     struct InitParams {
         bool mintable;
+        bytes32 imageHash;
+        bytes32 recipeHash;
+        uint256[] mintChains;
         uint256 masterChain;
         uint256 maxSupply;
         uint256 maxPerMint;
         uint256 minReviewThreshold;
         PriceSettings priceSettings;
+        string baseUri;
     }
 
     // https://docs.layerzero.network/v2/developers/evm/oft/quickstart#token-supply-cap
