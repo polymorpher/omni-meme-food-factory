@@ -50,7 +50,7 @@ contract FoodMeme is MemeMetadata, OFT, AccessControl {
     error AlreadyInitialized();
     error NotInitialized();
     error NotMasterChain();
-    error NotMintChain();
+    error NotMintChain(uint256 chainId);
     error MintDisabled();
 
     event EarlyUnlock(uint256 previousUnlockTime);
@@ -88,7 +88,7 @@ contract FoodMeme is MemeMetadata, OFT, AccessControl {
             }
         }
         if (!isMintChain) {
-            revert NotMintChain();
+            revert NotMintChain(block.chainid);
         }
         _;
     }
@@ -177,13 +177,17 @@ contract FoodMeme is MemeMetadata, OFT, AccessControl {
         if (quantity > maxPerMint) {
             revert PerMintAmountExceeded();
         }
-        uint256 price = Utils.computeUnitPrice(priceSettings, quantity, totalSupply());
+        uint256 price = mintPrice(quantity);
         if (!(msg.value >= price * quantity)) {
             revert InsufficientPayment();
         }
         _mint(recipient, quantity);
         // TODO: when there are more than 1 mint chains, we should use layer zero messages to sync supply increment to master chain. Per-chain price setting should still be allowed.
         // TODO: also note the total supply should be propagated to all chains, if we still want to have supply control - and very important to do that, in the case which the bounding curve (unit price) is linear or quadratic,
+    }
+
+    function mintPrice(uint256 quantity) public view mintChainOnly returns (uint256) {
+        return Utils.computeUnitPrice(priceSettings, quantity, totalSupply(), maxSupply);
     }
 
     function hasReviewed(address user) public view masterChainOnly returns (bool) {

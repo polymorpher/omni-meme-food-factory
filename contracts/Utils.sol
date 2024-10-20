@@ -1,11 +1,34 @@
 // SPDX-License-Identifier: CC-BY-NC-4.0
 pragma solidity ^0.8.26;
 
+import "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/IMessageLibManager.sol";
+import "@layerzerolabs/oapp-evm/interfaces/IOAppOptionsType3.sol";
+
 library Utils {
     struct MemeParams {
         string name;
         string symbol;
         address endpoint;
+    }
+
+    struct LzSetConfigParam {
+        SetConfigParam[] config;
+    }
+
+    struct LzEnforcedOptionParam {
+        EnforcedOptionParam[] config;
+    }
+
+    struct LzParams {
+        uint32[] endPointIds;
+        bytes32[] remoteContractAddresses; // addresses in bytes32 form to accommodate non-EVM chains
+        address[] sendLibraries;
+        address[] receiveLibraries;
+        uint256[] gracePeriods;
+        uint128[] minGasEnforceConfig;
+        LzSetConfigParam[] sendConfigParams;
+        LzSetConfigParam[] receiveConfigParams;
+        LzEnforcedOptionParam[] enforceConfigParams;
     }
 
     struct InitParams {
@@ -43,7 +66,7 @@ library Utils {
     }
 
     // TODO: check for risk of arithmetic error here. Probably switch to Q64 or Q96
-    function computeUnitPrice(PriceSettings memory s, uint256 quantity, uint256 supply)
+    function computeUnitPrice(PriceSettings memory s, uint256 quantity, uint256 supply, uint256 maxSupply)
         internal
         pure
         returns (uint256)
@@ -51,10 +74,11 @@ library Utils {
         if (s.mode == PriceMode.ConstantPrice) {
             return s.c;
         } else if (s.mode == PriceMode.LinearPrice) {
-            return s.b * (quantity + supply) + s.c;
+            return s.b * (quantity + supply) / maxSupply / DECIMALS + s.c / DECIMALS;
         }
         uint256 newSupply = quantity + supply;
-        return s.a * s.a * newSupply + s.b * newSupply + s.c;
+        return s.a * s.a * newSupply / DECIMALS / maxSupply / DECIMALS + s.b * newSupply / maxSupply / DECIMALS
+            + s.c / DECIMALS;
     }
 
     struct Review {
