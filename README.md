@@ -4,9 +4,9 @@
 
 Launch your own AI-powered food meme coin as Omni Fungible Token (OFT) on 70+ chains in ONE click(*), made possible by LayerZero V2
 
-4-minute demo: https://youtu.be/_uRSktRBb3Y
+(* Theoretically. In practice you might need to confirm transactions for a couple of times on your wallet. This will be improved in the future.)
 
-* Theoretically. In practice you might need to confirm transactions for a couple of times on your wallet. This will be improved in the future.
+4-minute demo: https://youtu.be/_uRSktRBb3Y
 
 - `src` folder contains client-side code for 
   - Launch Interface: imagine new meme with AI, preview the food images and recipes, specify launch parameters (mint price curve, price parameters, max supply, lock period, chains ...), connect wallet and pay (a very small) launch fee to deploy to multiple chains simultaneously
